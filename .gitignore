@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Python / Jupyter
+.ipynb_checkpoints/
+__pycache__/
+
+# Data files (keep raw data out of git)
+data/*.csv
+data/*.json
+data/*.sqlite
+data/*.db
+
+# Virtual environments
+.venv/
+env/
