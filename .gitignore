@@ -6,7 +6,6 @@
 __pycache__/
 
 # Data files (keep raw data out of git)
-data/*.csv
 data/*.json
 data/*.sqlite
 data/*.db
