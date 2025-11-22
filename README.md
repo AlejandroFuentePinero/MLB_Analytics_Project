@@ -46,7 +46,7 @@ mlb-analytics/
 │   ├── views.sql               # Reusable analytic views
 │   ├── analysis_queries.sql    # Core solutions to business questions
 │   ├── advanced_queries.sql    # Extended/portfolio-level queries
-│   ├── optimised_queries.sql   # Performance-tuned versions of key queries
+│   └── optimised_queries.sql   # Performance-tuned versions of key queries
 │
 ├── notebooks/
 │   └── exploration.ipynb       # Python EDA, charts, tables
