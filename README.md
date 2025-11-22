@@ -1,45 +1,57 @@
 # MLB Analytics Project — Lahman Database (1871–2024)
 
-A comprehensive SQL analytics project exploring long-term patterns in MLB player development, career trajectories, team spending, and player attributes using the Lahman Baseball Database.  
-This project is designed as a **standalone, portfolio-ready demonstration of SQL proficiency**, supported by modular views, well-structured query files, and optional Python-based EDA.
+This project explores long-term patterns in MLB player development, careers, salaries, talent pipelines, and postseason performance using the Lahman Baseball Database (1871–2024).  
+It is designed as a **portfolio-ready SQL analytics project**, showcasing advanced SQL skills, modular analysis design, and optional Python-based EDA.
 
 ---
 
 ## 1. Overview
 
-This project uses the **Lahman Baseball Database (1871–2024)** to answer a wide range of analytical questions across four major themes:
+Using the Lahman Database (1871–2024), this project investigates four major themes:
 
-- **School / Talent Pipelines** — Which colleges produce MLB talent, and how has this changed over time?
-- **Team Salary & Payroll Dynamics** — Which teams are high spenders, when do teams cross major cumulative payroll milestones, and how does spending relate to postseason outcomes?
-- **Player Career Patterns** — At what ages do players debut/retire, how long do careers last, and how loyal are players to their first team?
-- **Player Physical & Comparative Profiles** — How do height, weight, and handedness vary by team, era, or position?
+- **Talent Pipelines** — Which colleges produce MLB players and how these patterns vary across decades.
+- **Team Salary & Payroll Dynamics** — How payroll evolves, which teams spend the most, and how spending relates to postseason outcomes.
+- **Career Trajectories** — Debut age, retirement age, career length distributions, and player loyalty to their first team.
+- **Player Physical & Comparative Profiles** — How height, weight, and handedness vary across eras, teams, positions, and leagues.
 
-The project extends beyond basic SQL tasks and incorporates advanced analytics, including Hall of Fame comparisons, league/era splits, park-based effects, and postseason-performance modelling.
+Advanced analysis includes Hall of Fame comparisons, ballpark-factor effects, multi-era splits, and multi-step SQL models using window functions and chained CTEs.
 
 ---
 
 ## 2. Data Source
 
 - **Dataset:** Lahman Baseball Database  
-- **Version:** 2024 update (1871–2024 seasons)  
+- **Version:** 2024 release (covering seasons 1871–2024)  
 - **Website:** https://sabr.org/lahman-database/  
-- **Format:** CSV tables imported into PostgreSQL  
-- **Coverage:** MLB players, teams, salaries, colleges, parks, managers, postseason results, Hall of Fame voting, awards, appearances, and more.
+- **Repository Data Layout:**
+  - `data/core/` — The core Lahman tables used in this project  
+  - `data/extra/` — Additional Lahman tables not used in this project  
+  - `readme2024u.txt` — Official Lahman dataset documentation
 
-All project-owned transformations are implemented as **views** under the schema:
+### PostgreSQL Import
+
+All tables are imported into the **default `public` schema** of a PostgreSQL database.  
+Raw tables are not modified or renamed.
+
+Analytical objects (views) may optionally reside in a separate schema:
 
 ```sql
 CREATE SCHEMA IF NOT EXISTS mlb_analytics;
 ```
 
-No base tables are modified.
+Raw data remains in `public`.
 
 ---
 
 ## 3. Repository Structure
 
 ```
-mlb-analytics/
+MLB_Analytics_Project/
+│
+├── data/
+│   ├── core/                    # Core Lahman tables used in the project
+│   ├── extra/                   # Additional Lahman tables not used in schema
+│   └── readme2024u.txt          # Official Lahman dataset documentation
 │
 ├── sql/
 │   ├── schema.sql              # Project schema + optional summary objects
@@ -49,74 +61,71 @@ mlb-analytics/
 │   └── optimised_queries.sql   # Performance-tuned versions of key queries
 │
 ├── notebooks/
-│   └── exploration.ipynb       # Python EDA, charts, tables
+│   └── exploration.ipynb        # Optional Python EDA notebook
 │
 ├── docs/
-│   ├── project_overview.md     # Narrative overview of the project
-│   ├── business_questions.md   # Full question set (core + advanced)
-│   └── schema_design.md        # Documentation of base + analytic schema
+│   ├── project_overview.md      # Narrative overview of the project
+│   ├── business_questions.md    # Core + advanced analytical questions
+│   └── schema_design.md         # Documentation of schema and tables used
 │
-└── README.md                   # This file
+└── README.md                    # This file
 ```
 
 ---
 
 ## 4. Business Questions
 
-All core and advanced analytical questions are documented in:
+The complete set of analytical questions is in:
 
 ```
 docs/business_questions.md
 ```
 
-These include:
+Topics include:
 
-- Player counts, debut/retirement ages, career length  
-- School production patterns  
-- Payroll rankings, cumulative spending, postseason relevance  
-- Hall of Fame vs non–Hall of Fame comparisons  
-- Player physical traits and how they've changed by era  
-- Ballpark and league effects  
-- Team-level handedness composition  
-- And more
+- Player counts and debut patterns  
+- Retirement age and career length analyses  
+- College → MLB talent production rankings  
+- Payroll evolution and cumulative spending milestones  
+- Postseason performance vs payroll  
+- Hall-of-Fame vs non-HOF comparisons  
+- Height, weight, and handedness trends across eras  
+- Team-level physical and handedness profiles  
 
-Each question is labeled:
+Each question is labeled either:
 
-- **(C)** — core question  
-- **(advance query)** — extended portfolio question  
+- **(C)** — Core question  
+- **(advanced query)** — Extended portfolio-level analytical question  
 
 ---
 
 ## 5. How to Run the Project
 
-### A. Import the Dataset into PostgreSQL
+### A. Import Data into PostgreSQL
 
-1. Create a new PostgreSQL database (e.g., `lahman_db`).
-2. Import all Lahman 2024 CSV files into their corresponding tables.
-3. Run:
+1. Create a PostgreSQL database (e.g., `lahman_2024` or `mlb_project`).
+2. Import all CSVs from `data/core/` into the **public** schema.
+3. (Optional) Create a schema for analysis views:
+   ```sql
+   CREATE SCHEMA mlb_analytics;
+   ```
+4. Load supporting objects:
+   ```sql
+   \i sql/schema.sql;
+   \i sql/views.sql;
+   ```
 
-```sql
-\i sql/schema.sql;
-\i sql/views.sql;
-```
-
-This creates the `mlb_analytics` schema and the analytical views.
-
----
-
-### B. Running SQL Analyses
+### B. Execute Analysis Queries
 
 Use the SQL files in the `sql/` directory:
 
-- **analysis_queries.sql** → Core business-question solutions  
-- **advanced_queries.sql** → Extended, deeper analyses  
-- **optimised_queries.sql** → Performance-tuned versions (optional)
+- `analysis_queries.sql` — Core business questions  
+- `advanced_queries.sql` — Extended analyses  
+- `optimised_queries.sql` — Performance-tuned versions  
 
-These can be run section by section in pgAdmin, DBeaver, Azure Data Studio, or any SQL client.
+These can be run using pgAdmin, DBeaver, Azure Data Studio, or psql.
 
----
-
-### C. Python EDA (Optional)
+### C. Optional Python EDA
 
 Open:
 
@@ -124,57 +133,55 @@ Open:
 notebooks/exploration.ipynb
 ```
 
-This notebook includes:
+Includes:
 
-- SQL-to-pandas queries  
-- Visualisations of long-term trends  
-- Exploratory and supplementary analyses  
+- SQL-to-pandas workflows  
+- Visualisations of long-term MLB trends  
+- Additional exploratory analysis  
 
 ---
 
-## 6. Tools & Techniques
+## 6. Tools & Techniques Demonstrated
 
-This project demonstrates:
-
-- Relational modelling  
+- Relational modelling and schema design  
 - Multi-table joins  
-- CTEs for multi-stage logic  
-- Window functions (ranking, percentiles, running totals, lag/lead)  
-- Analytical view design  
-- Cross-era and cross-league comparisons  
-- Postseason/payroll modelling  
-- SQL + Python integration for EDA  
-- Query performance optimisation strategies  
+- Window functions (RANK, LAG/LEAD, percentiles, running totals)  
+- Chained CTEs for multi-stage analytical logic  
+- Dedicated analytics schema design  
+- Career and salary modelling  
+- Cross-era and cross-league comparative analysis  
+- SQL + Python integration  
+- Performance optimisation (EXPLAIN/ANALYZE)  
 
 ---
 
 ## 7. Key Findings  
-*(To be completed after analysis)*
+(*To be completed after analysis*)  
 
-Example insights that will be summarised:
+Examples of expected insights include:
 
-- Decade-level evolution of school talent pipelines  
-- Payroll inequality between large-market and small-market teams  
-- Patterns in debut age and career longevity  
-- Hall of Fame vs non-HOF career differences  
-- Decade-over-decade changes in height and weight  
-- Ballpark/altitude effects on debut physical profiles  
-- Handedness distributions across franchises  
+- How college talent pipelines shift across decades  
+- Payroll inequality and spending dynamics  
+- Changes in debut age and career length over time  
+- Hall-of-Fame vs non-HOF career differences  
+- Height and weight trends across eras  
+- Ballpark characteristics shaping player profiles  
+- Team-level physical and handedness patterns  
 
 ---
 
 ## 8. Purpose
 
-This repository serves as both:
+This repository is both:
 
-1. A **portfolio-grade SQL analytics project** demonstrating end-to-end analytical capability (data ingestion → modelling → querying → interpretation → visualisation).  
-2. A deep exploratory study of over 150 years of MLB data, spanning schools, salaries, careers, teams, parks, postseason results, and physical attributes.
+1. A **portfolio-grade SQL project**, demonstrating end-to-end mastery of data ingestion, modelling, querying, and interpretation.  
+2. A **deep analytical exploration** of 150+ years of MLB history across salaries, careers, talent pipelines, physical profiles, and postseason outcomes.
 
-It is structured to mirror real-world analytical workflows through modular views, layered queries, and clear documentation.
+The project architecture mirrors professional analytics workflows using a layered structure (raw data → views → analysis queries → optional EDA).
 
 ---
 
 ## 9. License / Attribution
 
-The Lahman Database is published under the **Creative Commons Attribution-ShareAlike 3.0 Unported License**.  
-Details: https://creativecommons.org/licenses/by-sa/3.0/
+The Lahman Baseball Database is distributed under the **Creative Commons Attribution–ShareAlike 3.0 Unported License**.  
+License details: https://creativecommons.org/licenses/by-sa/3.0/
