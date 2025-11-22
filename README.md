@@ -47,7 +47,6 @@ mlb-analytics/
 │   ├── analysis_queries.sql    # Core solutions to business questions
 │   ├── advanced_queries.sql    # Extended/portfolio-level queries
 │   ├── optimised_queries.sql   # Performance-tuned versions of key queries
-│   └── playground.sql          # (Optional) scratch file for exploration
 │
 ├── notebooks/
 │   └── exploration.ipynb       # Python EDA, charts, tables
