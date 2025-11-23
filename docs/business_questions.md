@@ -12,23 +12,39 @@ This document defines the analytical questions addressed in the MLB Analytics Pr
 **Q1.1 (C)** — Data Coverage  
 How many MLB players in the database have at least one recorded college, and how many distinct schools appear in the data?
 
+Using the `people` table, there are **24,023** distinct MLB players in the database. Of these, **6,869 players** have at least one recorded college in the `collegeplaying` data (via the `v_player_school` view), meaning roughly **28–29%** of players have an associated college record, while the remaining **17,154** do not. Across all players with recorded college data, there are **1,122 distinct schools** that have produced at least one MLB player, giving us a reasonably broad—but far from complete—coverage of the historical college-to-MLB pipeline.
+
 **Q1.2 (C)** — Schools by Debut Decade  
 For each **debut decade**, how many schools produced at least one MLB player?
+
+Linking each player’s MLB debut year with all colleges they attended shows how the breadth of the college-to-MLB pipeline has changed over time. The number of schools represented rises steadily from just **11 schools** in the 1870s to a peak of around **470 schools** for players debuting in the **1990s**, reflecting the expansion and diversification of collegiate baseball. The counts decline slightly in the 2000s and more sharply in the 2010s, largely because modern MLB rosters include more international players, high-school draftees, and athletes from non-collegiate development pathways, resulting in fewer players with recorded college data in recent decades.
 
 **Q1.3 (C)** — Top Producer Schools (All-Time)  
 Which are the **top 5 schools** by total number of MLB players produced?
 
+Counting how many distinct MLB players attended each college shows a clear hierarchy of powerhouse programs. The top five schools by total MLB players produced are **Texas**, **USC**, **Arizona State**, **Stanford**, and **Michigan**, with Texas alone sending just over a hundred players to the majors. These programs stand out as long-term talent pipelines, consistently contributing a large share of MLB-calibre players across eras.
+
 **Q1.4 (C)** — Top Schools per Decade  
 For each debut decade, which **top 3 schools** produced the most players?
+
+Ranking schools within each MLB debut decade shows how a small group of collegiate programs consistently sit at the top of the talent pipeline. Across most decades from the mid-20th century onward, schools like **Texas**, **USC**, and **Arizona State** regularly appear among the top three producers of MLB players, often joined by other major Division I programs in specific eras. Earlier decades feature fewer and more regionally concentrated schools, whereas later decades show a broader mix of institutions reaching the top ranks. This pattern highlights both the long-term dominance of a handful of powerhouse programs and the gradual diversification of the college systems contributing players to MLB.
 
 **Q1.5 (advance query)** — High-Impact Schools Since 1980  
 Since 1980, which schools have produced the most players whose careers lasted **5+ seasons**?
 
+Focusing on players who debuted from 1980 onwards and went on to play at least **five MLB seasons** highlights a smaller set of truly high-impact college programs. The leading schools by this measure are **Arizona State** (38 such players), **UCLA** (35), **USC** (33), **LSU** (32), and **Texas** (28). Compared with all-time counts, this filters out short or marginal careers and shows which programs have most consistently produced players who not only reach the majors but also stay there long enough to establish substantial MLB careers.
+
 **Q1.6 (advance query)** — Consistent Talent Pipelines  
 Across all debut decades, which schools have produced MLB players in **at least 5 different decades**, and how many players did they produce in each of those decades?
 
+Restricting attention to schools that have produced MLB players in **five or more different debut decades** reveals two broad patterns. First, a cluster of historically rooted programs show **very long continuity**: schools such as **Michigan**, **Brown**, **Holy Cross**, **Fordham**, **Princeton**, and **Penn State** appear from the late 19th or early 20th century and continue to send players to the majors well into the 2000s. Their decade-by-decade counts fluctuate, but they rarely disappear entirely, indicating deep, enduring baseball traditions.
+
+Second, a group of **modern powerhouse programs** emerge strongly from the 1960s onward, with sustained or growing output across recent decades. Examples include **Arizona**, **Arizona State**, **LSU**, **Miami (FL)**, **Florida**, **Florida State**, **Oklahoma**, **Oklahoma State**, **Georgia Tech**, **Clemson**, **Long Beach State**, **Rice**, and **South Carolina**. These schools typically have modest representation in early decades (or none at all), followed by large spikes in the 1980s–2010s, reflecting the rise of major Division I programs as primary feeders into MLB. Together, these patterns highlight how the college-to-MLB pipeline has shifted from a small number of early historically established universities to a broad landscape dominated by modern baseball-focused institutions, while a handful of legacy schools have remained consistently present across more than a century of professional baseball.
+
 **Q1.7 (advance query)** — Regional Talent Concentration  
 Using school state/region, which states have the highest **per-decade growth** in MLB player production since 1950?
+
+Using school locations, we tracked how many MLB players each U.S. state produced per debut decade from 1950 onward and then fitted a linear trend to quantify “per-decade growth” in player output. The strongest growth is concentrated in **California**, **Texas**, and **Florida**, with California adding on average about **17 more MLB players per decade**, and Texas and Florida each adding roughly **13**. A second tier of fast-growing states includes **South Carolina**, **Louisiana**, **North Carolina**, **Georgia**, and **Oklahoma**, all with clearly positive slopes. In contrast, several historically important baseball states in the Northeast and Midwest—such as **New York**, **Michigan**, and **Minnesota**—show flat or even negative trends, indicating that relative talent production has shifted toward the Sun Belt and West over the post-1950 era.
 
 ---
 

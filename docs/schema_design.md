@@ -11,11 +11,11 @@ The goal is to provide a clear understanding of the underlying raw data model an
 ## Base Schema: Lahman Database (1871–2024)
 
 The raw Lahman dataset is loaded directly into PostgreSQL with **no restructuring** of tables.  
-The project uses **10 core tables** corresponding exactly to the CSV files imported into the database.
+The project uses **11 core tables** corresponding to the CSV files inside `data/core`.
 
 ---
 
-## Core Tables Used (10 Total)
+## Core Tables Used (11 Total)
 
 ### **1. People**
 Biographical and career information for every MLB player.
@@ -82,7 +82,8 @@ Metadata for each school.
 
 ### **8. CollegePlaying**
 Links players to schools they attended.
-- Composite PK: (`playerID`, `schoolID`)  
+- Surrogate PK: `collegePlaying_id`  
+- Logical unique key: (`playerID`, `schoolID`, `yearID`)  
 - Used for school → MLB progression and pipeline evaluations.
 
 ---
@@ -91,15 +92,24 @@ Links players to schools they attended.
 Hall of Fame voting and induction data.
 - Composite PK: (`playerID`, `yearID`, `votedBy`)  
 - Ballots, votes, induction status  
-- Used for comparing inducted vs. non-inducted player careers.
+- Used for comparing inducted vs non-inducted player careers.
 
 ---
 
 ### **10. SeriesPost**
 Postseason series outcomes.
 - Composite PK: (`yearID`, `round`, `teamIDwinner`, `teamIDloser`)  
-- Series winners, losers, and games won  
+- Series winners, losers, games won  
 - Used for postseason performance and payroll correlation analyses.
+
+---
+
+### **11. Parks**
+Ballpark metadata (current + historical).
+- `id` (PK)  
+- `parkalias`, `parkname`, `parkkey`  
+- City, state, country  
+- Used for park-based analyses and for linking teams and appearances to parks.
 
 ---
 
