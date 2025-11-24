@@ -234,3 +234,153 @@ ORDER BY teamID;
 -- while WAS reached it in 2016. 
 -- Overall, the timing clearly separates long-term high-spending organizations 
 -- from those with historically lower payroll investment.
+
+-- ---------------------------------
+-- Part III — Player Career Analysis
+-- ---------------------------------
+-- Q3.1 (C) — Player Count
+-- Count total number of players recorded in the People table.
+
+SELECT COUNT(*) AS total_players
+FROM people;
+
+-- Answer: 24,023 players
+
+-- Q3.2 (C) — Player age at debut, age at final game, and career length
+-- For each player with a complete birthdate and game dates, calculate:
+--   * age at first MLB game
+--   * age at last MLB game
+--   * total career length in MLB
+-- Then order by longest careers first.
+
+WITH player_birthdates AS (
+    SELECT
+        playerid,
+        debut,
+        finalgame,
+        MAKE_DATE(birthyear, birthmonth, birthday) AS birth_date
+    FROM people
+    WHERE birthyear IS NOT NULL
+      AND birthmonth IS NOT NULL
+      AND birthday IS NOT NULL
+      AND debut IS NOT NULL
+      AND finalgame IS NOT NULL
+)
+
+SELECT
+    playerid,
+    AGE(debut, birth_date)      AS age_first_game,
+    AGE(finalgame, birth_date)  AS age_last_game,
+    AGE(finalgame, debut)       AS career_length
+FROM player_birthdates
+ORDER BY career_length DESC, playerid;
+
+-- Answer: Computes each player's age at debut and final game, plus total MLB career length,
+-- for players with complete birth and game dates, ordered by longest careers first. The top 5 longest
+-- career spanned 29-35 years!
+
+-- Q3.3 (C) — Starting and Ending Teams
+-- Identify the team(s) each player played for in their debut MLB season
+-- and in their final MLB season.
+
+WITH player_years AS (
+    SELECT
+        playerid,
+        EXTRACT(YEAR FROM debut)     AS debut_year,
+        EXTRACT(YEAR FROM finalgame) AS final_year
+    FROM people
+    WHERE debut IS NOT NULL
+      AND finalgame IS NOT NULL
+),
+
+debut_teams AS (
+    SELECT
+        py.playerid,
+        py.debut_year,
+        a.teamid AS debut_team
+    FROM player_years py
+    LEFT JOIN appearances a
+      ON py.playerid = a.playerid
+     AND py.debut_year = a.yearid
+),
+
+final_teams AS (
+    SELECT
+        py.playerid,
+        py.final_year,
+        a.teamid AS final_team
+    FROM player_years py
+    LEFT JOIN appearances a
+      ON py.playerid = a.playerid
+     AND py.final_year = a.yearid
+)
+
+SELECT
+    d.playerid,
+    d.debut_year,
+    d.debut_team,
+    f.final_year,
+    f.final_team
+FROM debut_teams d
+LEFT JOIN final_teams f
+  ON d.playerid = f.playerid
+ORDER BY d.playerid, d.debut_year;
+
+-- Answer: Returns the team(s) each player appeared for in their debut and final MLB seasons,
+-- including multiple rows for players who changed teams within those seasons.
+
+-- Q3.4 (C) — Loyal Long-Career Players
+-- Count players who played 10+ years AND started and ended their career
+-- on the same team.
+
+WITH player_years AS (
+    SELECT
+        playerid,
+        EXTRACT(YEAR FROM debut)     AS debut_year,
+        EXTRACT(YEAR FROM finalgame) AS final_year
+    FROM people
+    WHERE debut IS NOT NULL
+      AND finalgame IS NOT NULL
+),
+
+debut_teams AS (
+    SELECT
+        py.playerid,
+        py.debut_year,
+        a.teamid AS debut_team
+    FROM player_years py
+    LEFT JOIN appearances a
+      ON py.playerid = a.playerid
+     AND py.debut_year = a.yearid
+),
+
+final_teams AS (
+    SELECT
+        py.playerid,
+        py.final_year,
+        a.teamid AS final_team
+    FROM player_years py
+    LEFT JOIN appearances a
+      ON py.playerid = a.playerid
+     AND py.final_year = a.yearid
+),
+
+merged AS (
+    SELECT
+        d.playerid,
+        d.debut_year,
+        d.debut_team,
+        f.final_year,
+        f.final_team,
+        (f.final_year - d.debut_year) AS career_length
+    FROM debut_teams d
+    LEFT JOIN final_teams f
+      ON d.playerid = f.playerid
+)
+
+SELECT COUNT(*) AS loyal_long_career_players
+FROM merged
+WHERE career_length >= 10
+  AND debut_team = final_team;
+
+-- Answer: 422 players played 10+ years and finished on the same team they debuted with.

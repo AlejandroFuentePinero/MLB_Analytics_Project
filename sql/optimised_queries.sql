@@ -452,3 +452,73 @@ JOIN v_lcs_ws_teams AS p
 ORDER BY b.yearID;
 
 -- Same list of overperformers as advanced Q2.7 (1985 TOR, 1986 HOU, 1987 SFN/MIN, ... 2016 CLE).
+
+
+-- Optimised Queries (Part III)
+-- ------------------------------------------------------------
+-- During review of the analysis solutions for Part III, it
+-- became clear that several questions rely on the same
+-- recurring transformation:
+--
+--   • extracting each player's debut and final MLB seasons, and
+--   • joining those seasons to the Appearances table to recover
+--     the team(s) they played for in those years.
+--
+-- In the original queries (Q3.3–Q3.4), this logic was implemented
+-- via repeated CTEs (player_years, debut_teams, final_teams).
+-- While correct, this duplication increased query length and
+-- introduced opportunities for subtle inconsistencies.
+--
+-- To resolve this, Part III introduces a dedicated view:
+--
+--   • v_player_debut_final_teams – per-player mapping of debut
+--     year, final year, debut team(s), final team(s), and a
+--     simple year-based career length (final_year - debut_year).
+--
+-- This view replaces the repeated boilerplate and acts as a
+-- canonical transformation for career-start / career-end team
+-- analytics. It simplifies reasoning, improves readability, and
+-- ensures consistent behaviour across Part III.
+--
+-- The optimised versions of the relevant Part III queries are
+-- presented below, rewritten to use this view. The original,
+-- fully expanded versions (without the view) remain available in
+-- analysis_queries.sql.
+-- ------------------------------------------------------------
+
+
+-- Q3.3 (C, optimised)
+-- Which team did each player play for in their debut season and in
+-- their final season?
+
+SELECT
+    playerid,
+    debut_year,
+    debut_team,
+    final_year,
+    final_team
+FROM v_player_debut_final_teams
+ORDER BY
+    playerid,
+    debut_year;
+
+-- Same answer as analysis Q3.3, but now built directly on
+-- v_player_debut_final_teams. Players who switched teams within
+-- their debut or final season appear once per player–team
+-- combination.
+
+
+-- Q3.4 (C, optimised)
+-- How many players both:
+--   1. played 10+ years (based on debut vs final season), and
+--   2. started and ended their career on the same team?
+
+SELECT
+    COUNT(*) AS loyal_long_career_players
+FROM v_player_debut_final_teams
+WHERE career_length >= 10
+  AND debut_team = final_team;
+
+-- Same result as analysis Q3.4: 422 players meet both conditions
+-- of longevity (10+ years by calendar-year difference) and team
+-- loyalty (same debut and final team).

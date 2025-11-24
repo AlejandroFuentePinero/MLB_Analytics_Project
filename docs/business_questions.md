@@ -44,7 +44,7 @@ Second, a group of **modern powerhouse programs** emerge strongly from the 1960s
 **Q1.7 (advance query)** — Regional Talent Concentration  
 Using school state/region, which states have the highest **per-decade growth** in MLB player production since 1950?
 
-Using school locations, we tracked how many MLB players each U.S. state produced per debut decade from 1950 onward and then fitted a linear trend to quantify “per-decade growth” in player output. The strongest growth is concentrated in **California**, **Texas**, and **Florida**, with California adding on average about **17 more MLB players per decade**, and Texas and Florida each adding roughly **13**. A second tier of fast-growing states includes **South Carolina**, **Louisiana**, **North Carolina**, **Georgia**, and **Oklahoma**, all with clearly positive slopes. In contrast, several historically important baseball states in the Northeast and Midwest—such as **New York**, **Michigan**, and **Minnesota**—show flat or even negative trends, indicating that relative talent production has shifted toward the Sun Belt and West over the post-1950 era.
+Using school locations, I tracked how many MLB players each U.S. state produced per debut decade from 1950 onward and then fitted a linear trend to quantify “per-decade growth” in player output. The strongest growth is concentrated in **California**, **Texas**, and **Florida**, with California adding on average about **17 more MLB players per decade**, and Texas and Florida each adding roughly **13**. A second tier of fast-growing states includes **South Carolina**, **Louisiana**, **North Carolina**, **Georgia**, and **Oklahoma**, all with clearly positive slopes. In contrast, several historically important baseball states in the Northeast and Midwest—such as **New York**, **Michigan**, and **Minnesota**—show flat or even negative trends, indicating that relative talent production has shifted toward the Sun Belt and West over the post-1950 era.
 
 ---
 
@@ -59,23 +59,23 @@ This provides a 30+ year window of modern MLB salary data, giving enough tempora
 **Q2.2 (C)** — Top Spending Teams (20% Threshold)  
 Which teams fall into the **top 20%** of average annual payroll spending?
 
-To identify the league’s highest-spending organizations, we calculated each franchise’s average annual payroll across all seasons and ranked teams into five equal-sized groups. The top 20% includes clubs such as the Angels, Yankees, Red Sox, Nationals, and Dodgers—organizations that consistently invest far more in player salaries than the rest of the league. These teams anchor the financial upper tier of MLB and typically operate with significantly greater payroll capacity year after year.
+To identify the league’s highest-spending organizations, I calculated each franchise’s average annual payroll across all seasons and ranked teams into five equal-sized groups. The top 20% includes clubs such as the Angels, Yankees, Red Sox, Nationals, and Dodgers—organizations that consistently invest far more in player salaries than the rest of the league. These teams anchor the financial upper tier of MLB and typically operate with significantly greater payroll capacity year after year.
 
 **Q2.3 (C)** — Cumulative Payroll Over Time  
 For each team, what is the **cumulative sum of payroll** across all available seasons?
 
-We first calculated each franchise’s total historical payroll by summing all recorded salaries across the entire dataset. This provides a consolidated view of long-term financial investment by each team, independent of how payroll fluctuated year to year.
+I first calculated each franchise’s total historical payroll by summing all recorded salaries across the entire dataset. This provides a consolidated view of long-term financial investment by each team, independent of how payroll fluctuated year to year.
 
 The results show a steep hierarchy in total spending. The New York Yankees lead by a wide margin with more than **$3.7 billion** in total recorded payroll, followed by the Boston Red Sox (**$2.8B**), Los Angeles Dodgers (**$2.67B**), New York Mets (**$2.25B**), San Francisco Giants (**$2.18B**), and Philadelphia Phillies (**$2.15B**). At the other end of the spectrum, historically lower-spending clubs such as the Montreal Expos (**$408M**), Miami Marlins (**$339M**), California Angels (pre-rebranding, **$272M**), and Milwaukee Brewers’ early franchise code ML4 (**$234M**) show total outlays an order of magnitude smaller. 
 
 This simple cumulative view highlights long-term structural differences between large-market and small-market organizations.
 
-In the advanced analysis, we also computed cumulative payroll **over time** using a window function, allowing us to track how quickly each franchise accumulated spending and to identify milestones such as the first $1 billion season for each club. The core answer above uses the simpler “total across all seasons” interpretation, while the advanced version adds temporal insight into each team’s spending trajectory.
+In the advanced analysis, I also computed cumulative payroll **over time** using a window function, allowing us to track how quickly each franchise accumulated spending and to identify milestones such as the first $1 billion season for each club. The core answer above uses the simpler “total across all seasons” interpretation, while the advanced version adds temporal insight into each team’s spending trajectory.
 
 **Q2.4 (C)** — First Billion-Dollar Year  
 For each team, in which year did cumulative payroll first surpass **$1 billion**?
 
-By tracking cumulative payroll spending over time, we identified the first season in which each franchise exceeded the $1 billion milestone. Large-market and historically high-spending teams reached this threshold earlier, with the Yankees surpassing $1B as early as 2003 and the Red Sox in 2004. Mid-market teams generally crossed the line between 2007 and 2012, while lower-spending franchises did so even later. This pattern highlights long-term financial disparities across MLB and how resources have accumulated unevenly over the modern era.
+By tracking cumulative payroll spending over time, I identified the first season in which each franchise exceeded the $1 billion milestone. Large-market and historically high-spending teams reached this threshold earlier, with the Yankees surpassing $1B as early as 2003 and the Red Sox in 2004. Mid-market teams generally crossed the line between 2007 and 2012, while lower-spending franchises did so even later. This pattern highlights long-term financial disparities across MLB and how resources have accumulated unevenly over the modern era.
 
 **Q2.5 (advance query)** — Payroll Stratification  
 What is the ratio between the median team’s payroll and the average payroll of the top 20% teams?
@@ -87,14 +87,14 @@ From the start of the wildcard era (e.g. 1995) onward, how does a team’s **pay
 - For each year, rank teams by payroll (1 = highest).  
 - Compare the distribution of ranks for postseason vs non-postseason teams.
 
-To evaluate how financial strength translates into postseason success, we focused on the wildcard era (1995–2016). First, we identified the highest-payroll team in each season and checked whether it reached the postseason. Across 22 seasons, the top-payroll team qualified for October baseball in **17 seasons** and missed in **5**, meaning the #1 payroll club reached the postseason about **77% of the time**. This confirms that extreme payroll levels greatly increase a team’s likelihood of playing in the postseason, though they do not guarantee a playoff spot.
+To evaluate how financial strength translates into postseason success, I focused on the wildcard era (1995–2016). First, I identified the highest-payroll team in each season and checked whether it reached the postseason. Across 22 seasons, the top-payroll team qualified for October baseball in **17 seasons** and missed in **5**, meaning the #1 payroll club reached the postseason about **77% of the time**. This confirms that extreme payroll levels greatly increase a team’s likelihood of playing in the postseason, though they do not guarantee a playoff spot.
 
-We then examined the full distribution of payroll ranks among postseason teams. Using team-level payroll rank within each year (1 = highest), we counted how many postseason team-seasons came from each rank. The results show a strong skew toward higher payrolls: the top **5** ranks together accounted for **56** postseason team-seasons (around **30%** of all postseason slots), and the top **10** ranks produced **104** postseason team-seasons (roughly **56%**). In contrast, the bottom third of the payroll table (ranks 21–30) produced only **28** postseason team-seasons (about **15%**), and no team ranked 30th in payroll reached the postseason during this period. Overall, postseason baseball is dominated by higher-spending teams, but there is still meaningful room for lower-payroll clubs to reach October, highlighting both the power and the limits of financial advantage.
+I then examined the full distribution of payroll ranks among postseason teams. Using team-level payroll rank within each year (1 = highest), I counted how many postseason team-seasons came from each rank. The results show a strong skew toward higher payrolls: the top **5** ranks together accounted for **56** postseason team-seasons (around **30%** of all postseason slots), and the top **10** ranks produced **104** postseason team-seasons (roughly **56%**). In contrast, the bottom third of the payroll table (ranks 21–30) produced only **28** postseason team-seasons (about **15%**), and no team ranked 30th in payroll reached the postseason during this period. Overall, postseason baseball is dominated by higher-spending teams, but there is still meaningful room for lower-payroll clubs to reach October, highlighting both the power and the limits of financial advantage.
 
 **Q2.7 (advance query)** — Overperformers: Small Payroll, Big Results  
 Identify seasons where a team’s payroll is in the **bottom third** of the league, but the team still reached the **League Championship Series or World Series**. List those teams and seasons.
 
-To identify cases where a team significantly outperformed its financial resources, we flagged teams in the bottom third of league payroll each season and checked whether they reached the League Championship Series (ALCS/NLCS) or the World Series. This produced a focused list of genuine “small-payroll overperformers.”
+To identify cases where a team significantly outperformed its financial resources, I flagged teams in the bottom third of league payroll each season and checked whether they reached the League Championship Series (ALCS/NLCS) or the World Series. This produced a focused list of genuine “small-payroll overperformers.”
 
 Across the full dataset, only a small set of low-payroll clubs reached the LCS or beyond. Examples include the 1985 Blue Jays, 1986 Astros, 1987 Giants and Twins, 1989 Cubs, 1990 Reds, 1991 Braves, 2002 Twins, 2003 Marlins, 2006 Athletics, 2007 Guardians/Indians, Rockies, and Diamondbacks, 2008 Rays, 2010 Rangers, 2014 Royals, 2015 Mets, and 2016 Guardians/Indians. These seasons stand out as clear outliers where modest payrolls were converted into deep postseason runs, highlighting that while money strongly shapes outcomes, it does not fully determine them.
 
@@ -105,6 +105,8 @@ Across the full dataset, only a small set of low-payroll clubs reached the LCS o
 **Q3.1 (C)** — Player Count  
 How many players exist in the `People` table?
 
+The database contains 24,023 unique MLB players.
+
 **Q3.2 (C)** — Career Timelines  
 For each player with complete data, calculate:  
 - Age at first game  
@@ -112,24 +114,36 @@ For each player with complete data, calculate:
 - Career length (in years)  
 Sort from longest to shortest career.
 
+For players with complete birth and game dates, this query builds a per-player profile of **career timing** in MLB. It calculates each player’s age at debut, age at their final MLB appearance, and the total length of their MLB career, then orders everyone by career length. The top of the result set highlights a small group of players with **exceptionally long careers spanning multiple decades**, while further down I see the far more common pattern of careers lasting only a few seasons. This contrast between multi-decade veterans and short-tenure players gives immediate intuition about how skewed MLB career longevity is. The resulting table is a reusable foundation for later analyses on how debut age relates to longevity, how retirement ages are distributed, and which players stand out as outliers in terms of career duration.
+
 **Q3.3 (C)** — Starting & Ending Teams  
 Which team did each player play for in their **debut season** and in their **final season**?
+
+This query identifies the team or teams each MLB player appeared for in their debut season and in their final season. Using the `People` table, I extract each player’s debut and final game years, then join these to the season-level `Appearances` data to find the corresponding team IDs. The result shows, for every player with both a debut and final game recorded, where they first entered the league and where they played their last MLB season. Players who switched teams within their debut or final season appear multiple times, reflecting all teams they played for in those years rather than forcing a single “primary” team. This output provides a foundation for later questions on franchise loyalty, player mobility, and how careers begin and end across different teams.
 
 **Q3.4 (C)** — Loyal Long-Career Players  
 How many players both:  
 1. Played **10+ years**, and  
 2. Started and ended their career on the **same team**?
 
+To identify long-tenured, highly loyal players, I combined career duration with franchise consistency. A player qualifies if they played at least 10 years (based on debut and final season) and if the team they debuted with matches the team they ended their career on. Using the season-level `Appearances` data to determine each player’s debut and final-season teams, I found **422 players** who meet both criteria. These players represent a small but notable subset of MLB history: individuals who achieved long careers while remaining tied to the same franchise from start to finish. This group forms an interesting counterpoint to the more common pattern of frequent trades and late-career team changes.
+
 **Q3.5 (advance query)** — Top Career Lengths  
 List the **top 20 longest careers** with debut year, final year, starting team, and ending team.
+
+Using the unified career timeline view, I identified the 20 longest MLB careers by calendar-year span. The longest careers extend more than three decades, led by players like Al Orth (35 years) and Jim O’Rourke (32 years), with others such as Minnie Miñoso and Nolan Ryan illustrating how both early-era and modern players can produce exceptionally long tenures. The output also shows how often these players changed franchises over such extended periods, with only a handful beginning and ending on the same team. This result highlights the extreme right tail of MLB career longevity and provides context for evaluating typical vs. exceptional career arcs in later analyses.
 
 **Q3.6 (advance query)** — Hall of Fame vs Non–Hall of Fame Careers  
 Compare **career length** and **age at debut** between players who are inducted into the Hall of Fame (`inducted = 'Y'`) and those who are not.  
 Summarise median values and distribution differences.
 
+Using complete biographical and career-timeline data, I compared age at debut and total career length between Hall of Fame inductees and all non-inducted players. Hall-of-Famers debut significantly earlier, with a median age of around 21.6 years, compared to 23.8 years for non-HOF players. Career length differences are even more pronounced: the median Hall-of-Fame career spans roughly 17.2 years, while non-HOF players average only about 5.3 years. Both groups include extreme long-career outliers (30+ years), showing that longevity alone does not guarantee induction, but the overall distribution confirms that early entry into MLB and sustained career duration strongly correlate with HOF membership. This analysis highlights the structural differences between elite careers and typical MLB trajectories.
+
 **Q3.7 (advance query)** — Primary Franchise of Hall of Famers  
 For each Hall of Fame player, identify the team for which they played the **most games** over their career (primary franchise).  
 Which franchises have the most Hall of Famers primarily associated with them?
+
+To identify the primary franchise of each Hall of Famer, I summed every type of appearance recorded in the `Appearances` table to estimate total games played for each team across a player’s career. I then ranked teams per player and selected the franchise for which they accumulated the most games. After filtering to Hall-of-Fame inductees, I counted how many players were primarily associated with each franchise. The results show a clear hierarchy: the New York Yankees (NYA) lead all franchises with 24 Hall of Famers whose longest tenures occurred with the team. They are followed by the St. Louis Cardinals (SLN), Chicago White Sox (CHA), Chicago Cubs (CHN), and Pittsburgh Pirates (PIT). This pattern reflects both historical success and the long-standing ability of these franchises to attract and retain elite players.
 
 ---
 

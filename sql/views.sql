@@ -90,3 +90,37 @@ SELECT DISTINCT
     teamIDloser AS teamID
 FROM seriespost
 WHERE round IN ('ALCS', 'NLCS', 'WS');
+
+-- View: v_player_debut_final_teams
+-- Purpose: Link each player to their debut and final MLB seasons, along with
+--          the team(s) they appeared for in those seasons and a simple
+--          year-based career length.
+-- Notes:   Keeps one row per player–debut-team–final-team combination.
+--          Players who appeared for multiple teams in their debut or final
+--          season will have multiple rows. Career length is computed as
+--          final_year - debut_year (calendar-year difference).
+
+CREATE OR REPLACE VIEW v_player_debut_final_teams AS
+SELECT
+    py.playerid,
+    py.debut_year,
+    py.final_year,
+    ad.teamid AS debut_team,
+    af.teamid AS final_team,
+    (py.final_year - py.debut_year) AS career_length
+FROM (
+    SELECT
+        playerid,
+        EXTRACT(YEAR FROM debut)     AS debut_year,
+        EXTRACT(YEAR FROM finalgame) AS final_year
+    FROM people
+    WHERE debut IS NOT NULL
+      AND finalgame IS NOT NULL
+) AS py
+LEFT JOIN appearances AS ad
+  ON py.playerid = ad.playerid
+ AND py.debut_year = ad.yearid
+LEFT JOIN appearances AS af
+  ON py.playerid = af.playerid
+ AND py.final_year = af.yearid;
+

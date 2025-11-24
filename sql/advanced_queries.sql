@@ -536,3 +536,149 @@ ORDER BY yearID;
 -- 2014 KCA
 -- 2015 NYN
 -- 2016 CLE
+
+-- ---------------------------------
+-- Part III — Player Career Analysis
+-- ---------------------------------
+
+-- Q3.5 (Advanced) — Top 20 Longest Careers
+-- Using the v_player_debut_final_teams view, identify the 20 longest
+-- MLB careers by calendar-year career length, returning debut year,
+-- final year, starting team, and ending team.
+
+SELECT
+    playerid,
+    debut_year,
+    final_year,
+    debut_team,
+    final_team,
+    career_length
+FROM v_player_debut_final_teams
+ORDER BY career_length DESC, playerid
+LIMIT 20;
+
+-- Answer: Returns the top 20 longest MLB careers (calendar-year difference),
+-- including debut/final teams and career lengths up to 35 years.
+
+-- Q3.6 (Advanced) — Hall of Fame vs Non–Hall of Fame Careers
+-- Compare age at debut and career length between HOF inductees and
+-- non-inducted players using median, min, and max summaries.
+
+WITH player_birthdates AS (
+    SELECT
+        playerid,
+        debut,
+        finalgame,
+        MAKE_DATE(birthyear, birthmonth, birthday) AS birth_date
+    FROM people
+    WHERE birthyear IS NOT NULL
+      AND birthmonth IS NOT NULL
+      AND birthday IS NOT NULL
+      AND debut IS NOT NULL
+      AND finalgame IS NOT NULL
+),
+
+debut_career AS (
+    SELECT
+        playerid,
+        AGE(debut, birth_date) AS age_debut,
+        AGE(finalgame, debut)  AS career_length
+    FROM player_birthdates
+),
+
+hof_flag AS (
+    SELECT
+        d.playerid,
+        d.age_debut,
+        d.career_length,
+        COALESCE(h.inducted, 'N') AS hof
+    FROM debut_career d
+    LEFT JOIN halloffame h
+      ON d.playerid = h.playerid
+)
+
+SELECT
+    hof,
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY age_debut)      AS median_age_debut,
+    MIN(age_debut)                                              AS min_age_debut,
+    MAX(age_debut)                                              AS max_age_debut,
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY career_length)  AS median_career_length,
+    MIN(career_length)                                          AS min_career_length,
+    MAX(career_length)                                          AS max_career_length
+FROM hof_flag
+GROUP BY hof
+ORDER BY hof DESC;
+
+-- Answer: Compares debut age and career length distributions between
+-- Hall of Fame inductees and all non-inducted players.
+
+-- Q3.7 (Advanced) — Primary Franchise of Hall of Famers
+-- Identify each HOF player's primary franchise (team with the most
+-- career games played) and count how many inductees are primarily
+-- associated with each franchise.
+
+WITH games AS (
+    SELECT
+        teamid,
+        playerid,
+        COALESCE(g_all,0) + COALESCE(gs,0) + COALESCE(g_batting,0) +
+        COALESCE(g_defense,0) + COALESCE(g_p,0) + COALESCE(g_c,0) +
+        COALESCE(g_1b,0) + COALESCE(g_2b,0) + COALESCE(g_3b,0) +
+        COALESCE(g_ss,0) + COALESCE(g_lf,0) + COALESCE(g_cf,0) +
+        COALESCE(g_rf,0) + COALESCE(g_of,0) + COALESCE(g_dh,0) +
+        COALESCE(g_ph,0) + COALESCE(g_pr,0) AS sum_games
+    FROM appearances
+    WHERE teamid IS NOT NULL
+      AND playerid IS NOT NULL
+),
+
+total_games AS (
+    SELECT
+        teamid,
+        playerid,
+        SUM(sum_games) AS total_games
+    FROM games
+    GROUP BY teamid, playerid
+),
+
+ranked AS (
+    SELECT
+        playerid,
+        teamid,
+        total_games,
+        RANK() OVER (PARTITION BY playerid ORDER BY total_games DESC) AS rnk
+    FROM total_games
+),
+
+primary_franchise AS (
+    SELECT playerid, teamid, total_games
+    FROM ranked
+    WHERE rnk = 1
+),
+
+hof_players AS (
+    SELECT playerid
+    FROM halloffame
+    WHERE inducted = 'Y'
+),
+
+hof_primary AS (
+    SELECT
+        pf.playerid,
+        pf.teamid,
+        pf.total_games
+    FROM primary_franchise pf
+    INNER JOIN hof_players h
+        ON pf.playerid = h.playerid
+)
+
+SELECT
+    teamid,
+    COUNT(DISTINCT playerid) AS hof_count
+FROM hof_primary
+GROUP BY teamid
+ORDER BY hof_count DESC;
+
+-- Answer: YANKEES (NYA) have the most HOF players primarily associated
+-- with their franchise, followed by the Cardinals (SLN), White Sox (CHA),
+-- and Cubs (CHN).
