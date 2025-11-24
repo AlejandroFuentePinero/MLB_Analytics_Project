@@ -127,3 +127,110 @@ ORDER BY
 -- -----------------------------------
 -- Part II — Salary & Payroll Analysis
 -- -----------------------------------
+
+-- Q2.1 (C)
+-- What is the year range and total record count in the Salaries table?
+
+SELECT 
+    COUNT(*) AS total_records,
+    MIN(yearID) AS first_year,
+    MAX(yearID) AS last_year
+FROM salaries;
+
+-- Answer: The Salaries table contains 26,428 records spanning 1985–2016.
+
+-- Q2.2 (C)
+-- Which teams fall into the top 20% of average annual payroll spending?
+
+WITH avg_team_spending AS (
+    SELECT
+        teamID,
+        SUM(salary) AS total_salary,
+        COUNT(DISTINCT yearID) AS n_years,
+        ROUND(SUM(salary) / COUNT(DISTINCT yearID), 2) AS avg_annual_payroll
+    FROM salaries
+    GROUP BY teamID
+),
+ranked AS (
+    SELECT
+        teamID,
+        avg_annual_payroll,
+        NTILE(5) OVER (ORDER BY avg_annual_payroll DESC) AS payroll_percentile
+    FROM avg_team_spending
+)
+SELECT
+    teamID,
+    avg_annual_payroll
+FROM ranked
+WHERE payroll_percentile = 1
+ORDER BY avg_annual_payroll DESC;
+
+-- Answer: These teams make up the top 20% of MLB organizations by average annual payroll:
+-- LAA, NYA, BOS, WAS, LAN, ARI, NYN.
+
+-- Q2.3 (C)
+-- For each team, what is the cumulative sum of payroll across all available seasons?
+
+SELECT
+    teamID,
+    SUM(salary) AS total_payroll
+FROM salaries
+GROUP BY teamID
+ORDER BY total_payroll DESC;
+
+-- Answer: This returns each team's total historical payroll; the Yankees (NYA) lead with over 3.7B in recorded salary spend, 
+-- followed by the Red Sox (BOS), Dodgers (LAN), Mets (NYN), and other large-market teams.
+
+-- Q2.4 (C)
+-- For each team, in which year did cumulative payroll first surpass $1 billion?
+
+WITH year_team_payroll AS (
+    SELECT
+        yearID,
+        teamID,
+        SUM(salary) AS annual_payroll
+    FROM salaries
+    GROUP BY yearID, teamID
+),
+cum_sum AS (
+    SELECT
+        teamID,
+        yearID,
+        annual_payroll,
+        SUM(annual_payroll) OVER (
+            PARTITION BY teamID
+            ORDER BY yearID
+        ) AS cumulative_payroll
+    FROM year_team_payroll
+),
+billion_crossing AS (
+    SELECT
+        teamID,
+        yearID,
+        cumulative_payroll,
+        ROW_NUMBER() OVER (
+            PARTITION BY teamID
+            ORDER BY yearID
+        ) AS rn
+    FROM cum_sum
+    WHERE cumulative_payroll >= 1000000000
+)
+SELECT
+    teamID,
+    yearID AS first_billion_year,
+    cumulative_payroll
+FROM billion_crossing
+WHERE rn = 1
+ORDER BY teamID;
+
+-- Answer:
+-- Most large-market teams crossed $1B earliest: the Yankees (NYA) in 2003, 
+-- Red Sox (BOS) in 2004, and Dodgers (LAN) and Braves (ATL) in 2005. 
+-- A second wave of teams—including the Cubs (CHN), Mets (NYN), Giants (SFN), 
+-- Mariners (SEA), and Cardinals (SLN)—reached $1B around 2006–2008. 
+-- Many mid-market teams surpassed the milestone between 2009 and 2012 
+-- (e.g., CLE, CIN, COL, MIN, ARI, KCA, OAK). 
+-- Smaller-spending franchises such as PIT and MIL crossed $1B later (2014–2015), 
+-- while WAS reached it in 2016. 
+-- Overall, the timing clearly separates long-term high-spending organizations 
+-- from those with historically lower payroll investment.

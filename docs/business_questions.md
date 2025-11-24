@@ -53,25 +53,50 @@ Using school locations, we tracked how many MLB players each U.S. state produced
 **Q2.1 (C)** — Salary Table Overview  
 What is the year range and total record count in the `Salaries` table?
 
+The `Salaries` table contains **26,428 total records** covering the years **1985 to 2016**.  
+This provides a 30+ year window of modern MLB salary data, giving enough temporal depth to analyze payroll evolution, compare spending patterns across eras, and ground later salary-related insights in a well-defined historical range.
+
 **Q2.2 (C)** — Top Spending Teams (20% Threshold)  
 Which teams fall into the **top 20%** of average annual payroll spending?
+
+To identify the league’s highest-spending organizations, we calculated each franchise’s average annual payroll across all seasons and ranked teams into five equal-sized groups. The top 20% includes clubs such as the Angels, Yankees, Red Sox, Nationals, and Dodgers—organizations that consistently invest far more in player salaries than the rest of the league. These teams anchor the financial upper tier of MLB and typically operate with significantly greater payroll capacity year after year.
 
 **Q2.3 (C)** — Cumulative Payroll Over Time  
 For each team, what is the **cumulative sum of payroll** across all available seasons?
 
+We first calculated each franchise’s total historical payroll by summing all recorded salaries across the entire dataset. This provides a consolidated view of long-term financial investment by each team, independent of how payroll fluctuated year to year.
+
+The results show a steep hierarchy in total spending. The New York Yankees lead by a wide margin with more than **$3.7 billion** in total recorded payroll, followed by the Boston Red Sox (**$2.8B**), Los Angeles Dodgers (**$2.67B**), New York Mets (**$2.25B**), San Francisco Giants (**$2.18B**), and Philadelphia Phillies (**$2.15B**). At the other end of the spectrum, historically lower-spending clubs such as the Montreal Expos (**$408M**), Miami Marlins (**$339M**), California Angels (pre-rebranding, **$272M**), and Milwaukee Brewers’ early franchise code ML4 (**$234M**) show total outlays an order of magnitude smaller. 
+
+This simple cumulative view highlights long-term structural differences between large-market and small-market organizations.
+
+In the advanced analysis, we also computed cumulative payroll **over time** using a window function, allowing us to track how quickly each franchise accumulated spending and to identify milestones such as the first $1 billion season for each club. The core answer above uses the simpler “total across all seasons” interpretation, while the advanced version adds temporal insight into each team’s spending trajectory.
+
 **Q2.4 (C)** — First Billion-Dollar Year  
 For each team, in which year did cumulative payroll first surpass **$1 billion**?
 
+By tracking cumulative payroll spending over time, we identified the first season in which each franchise exceeded the $1 billion milestone. Large-market and historically high-spending teams reached this threshold earlier, with the Yankees surpassing $1B as early as 2003 and the Red Sox in 2004. Mid-market teams generally crossed the line between 2007 and 2012, while lower-spending franchises did so even later. This pattern highlights long-term financial disparities across MLB and how resources have accumulated unevenly over the modern era.
+
 **Q2.5 (advance query)** — Payroll Stratification  
 What is the ratio between the median team’s payroll and the average payroll of the top 20% teams?
+
+Across all franchises, the median team’s average annual payroll is approximately **$60.3 million**, compared with **$90.5 million** for the top 20% of highest-spending teams. This yields a ratio of **0.67**, meaning the typical MLB team operates with only about **two-thirds of the financial resources** available to the league’s biggest spenders. This reveals a pronounced stratification in payroll capacity, where a small group of large-market teams maintain a significant financial advantage over the league median.
 
 **Q2.6 (advance query)** — Payroll vs Postseason Success  
 From the start of the wildcard era (e.g. 1995) onward, how does a team’s **payroll rank** in a given year relate to whether they reached the **postseason**?  
 - For each year, rank teams by payroll (1 = highest).  
 - Compare the distribution of ranks for postseason vs non-postseason teams.
 
+To evaluate how financial strength translates into postseason success, we focused on the wildcard era (1995–2016). First, we identified the highest-payroll team in each season and checked whether it reached the postseason. Across 22 seasons, the top-payroll team qualified for October baseball in **17 seasons** and missed in **5**, meaning the #1 payroll club reached the postseason about **77% of the time**. This confirms that extreme payroll levels greatly increase a team’s likelihood of playing in the postseason, though they do not guarantee a playoff spot.
+
+We then examined the full distribution of payroll ranks among postseason teams. Using team-level payroll rank within each year (1 = highest), we counted how many postseason team-seasons came from each rank. The results show a strong skew toward higher payrolls: the top **5** ranks together accounted for **56** postseason team-seasons (around **30%** of all postseason slots), and the top **10** ranks produced **104** postseason team-seasons (roughly **56%**). In contrast, the bottom third of the payroll table (ranks 21–30) produced only **28** postseason team-seasons (about **15%**), and no team ranked 30th in payroll reached the postseason during this period. Overall, postseason baseball is dominated by higher-spending teams, but there is still meaningful room for lower-payroll clubs to reach October, highlighting both the power and the limits of financial advantage.
+
 **Q2.7 (advance query)** — Overperformers: Small Payroll, Big Results  
 Identify seasons where a team’s payroll is in the **bottom third** of the league, but the team still reached the **League Championship Series or World Series**. List those teams and seasons.
+
+To identify cases where a team significantly outperformed its financial resources, we flagged teams in the bottom third of league payroll each season and checked whether they reached the League Championship Series (ALCS/NLCS) or the World Series. This produced a focused list of genuine “small-payroll overperformers.”
+
+Across the full dataset, only a small set of low-payroll clubs reached the LCS or beyond. Examples include the 1985 Blue Jays, 1986 Astros, 1987 Giants and Twins, 1989 Cubs, 1990 Reds, 1991 Braves, 2002 Twins, 2003 Marlins, 2006 Athletics, 2007 Guardians/Indians, Rockies, and Diamondbacks, 2008 Rays, 2010 Rangers, 2014 Royals, 2015 Mets, and 2016 Guardians/Indians. These seasons stand out as clear outliers where modest payrolls were converted into deep postseason runs, highlighting that while money strongly shapes outcomes, it does not fully determine them.
 
 ---
 
