@@ -522,3 +522,209 @@ WHERE career_length >= 10
 -- Same result as analysis Q3.4: 422 players meet both conditions
 -- of longevity (10+ years by calendar-year difference) and team
 -- loyalty (same debut and final team).
+
+
+-- Optimised Queries (Part IV)
+-- ------------------------------------------------------------
+-- During review of the Part IV analysis and advanced solutions,
+-- several questions were found to rely on repeated transformations:
+--
+--   • extracting debut year/decade and combining it with height,
+--     weight, and handedness from the People table,
+--   • determining each player's debut team and league,
+--   • and mapping debut teams to ballpark regions.
+--
+-- The dedicated views introduced in views.sql:
+--
+--   • v_player_morpho
+--   • v_player_debut_team
+--   • v_park_region
+--
+-- replace this repeated CTE boilerplate and act as canonical
+-- transformations for physical-profile analytics. The optimised
+-- Part IV queries below are rewritten to leverage these views.
+-- The original, fully expanded versions remain available in
+-- analysis_queries.sql and advanced_queries.sql.
+-- ------------------------------------------------------------
+
+
+-- Q4.4 (C, optimised)
+-- How have average height and average weight at debut changed
+-- over time (by debut year)?
+
+SELECT
+    debut_year,
+    ROUND(AVG(weight), 2) AS avg_weight,
+    ROUND(AVG(height), 2) AS avg_height
+FROM v_player_morpho
+WHERE debut_year IS NOT NULL
+  AND weight IS NOT NULL
+  AND height IS NOT NULL
+GROUP BY debut_year
+ORDER BY debut_year;
+
+-- Same answer as analysis Q4.4, but now built directly on
+-- v_player_morpho.
+
+
+-- Q4.5 (C, optimised)
+-- For each debut decade, what is the change (Δ) in average
+-- height and weight relative to the previous decade?
+
+WITH decade_average AS (
+    SELECT
+        debut_decade,
+        ROUND(AVG(weight), 2) AS avg_weight,
+        ROUND(AVG(height), 2) AS avg_height
+    FROM v_player_morpho
+    WHERE debut_decade IS NOT NULL
+      AND weight IS NOT NULL
+      AND height IS NOT NULL
+    GROUP BY debut_decade
+)
+SELECT
+    debut_decade,
+    avg_weight,
+    LAG(avg_weight) OVER (ORDER BY debut_decade) AS prev_decade_weight,
+    avg_weight
+        - LAG(avg_weight) OVER (ORDER BY debut_decade) AS weight_change,
+    avg_height,
+    LAG(avg_height) OVER (ORDER BY debut_decade) AS prev_decade_height,
+    avg_height
+        - LAG(avg_height) OVER (ORDER BY debut_decade) AS height_change
+FROM decade_average
+ORDER BY debut_decade;
+
+-- Same answer as analysis Q4.5: modest height gains and
+-- substantial weight gains across debut decades, especially
+-- into the modern era.
+
+
+-- Q4.6 (Advanced, optimised)
+-- How do debut physical profiles (height, weight) compare
+-- between pitchers and non-pitchers?
+
+WITH player_pitching_role AS (
+    SELECT
+        playerid,
+        CASE WHEN SUM(g_p) > 0 THEN 1 ELSE 0 END AS pitching_flag
+    FROM appearances
+    GROUP BY playerid
+)
+SELECT
+    pr.pitching_flag,
+    ROUND(AVG(m.height), 2) AS avg_height,
+    ROUND(AVG(m.weight), 2) AS avg_weight
+FROM player_pitching_role AS pr
+INNER JOIN v_player_morpho AS m
+    ON pr.playerid = m.playerid
+WHERE m.height IS NOT NULL
+  AND m.weight IS NOT NULL
+GROUP BY pr.pitching_flag
+ORDER BY pr.pitching_flag;
+
+-- Same result as advanced Q4.6: pitchers debut slightly taller
+-- and heavier on average than non-pitchers, but the difference
+-- is modest rather than dramatic.
+
+
+-- Q4.7 (Advanced, optimised)
+-- Debut Profiles by Era and League
+-- Compare average debut height and weight between leagues
+-- (AL vs NL) across eras (pre-1960, 1960–1989, 1990–present).
+
+WITH player_debut_league AS (
+    SELECT
+        pdt.playerid,
+        pdt.debut_year,
+        t.lgid AS league
+    FROM v_player_debut_team AS pdt
+    INNER JOIN teams AS t
+        ON pdt.debut_year = t.yearid
+       AND pdt.debut_teamid = t.teamid
+    WHERE t.lgid IN ('AL', 'NL')
+),
+morpho_by_era AS (
+    SELECT
+        pdl.playerid,
+        pdl.league,
+        CASE
+            WHEN pdl.debut_year < 1960 THEN 'a_pre-1960'
+            WHEN pdl.debut_year < 1990 THEN 'b_1960-1989'
+            ELSE 'c_1990-present'
+        END AS era,
+        m.height,
+        m.weight
+    FROM player_debut_league AS pdl
+    INNER JOIN v_player_morpho AS m
+        ON pdl.playerid = m.playerid
+    WHERE m.height IS NOT NULL
+      AND m.weight IS NOT NULL
+)
+SELECT
+    era,
+    league,
+    ROUND(AVG(weight), 2) AS avg_weight,
+    ROUND(AVG(height), 2) AS avg_height
+FROM morpho_by_era
+GROUP BY
+    era,
+    league
+ORDER BY
+    era,
+    league;
+
+-- Same interpretation as in the advanced Q4.7 analysis:
+-- AL and NL debut physiques are nearly identical in each era,
+-- with both leagues showing substantial weight increases and
+-- modest height gains from pre-1960 → 1960–1989 → 1990–present.
+
+
+-- Q4.8 (Advanced, optimised)
+-- Home Ballpark & Player Profile
+-- Do debut physical profiles vary depending on the geographic
+-- region of a player's first MLB home ballpark?
+
+WITH player_debut_park AS (
+    SELECT
+        pdt.playerid,
+        pdt.debut_year,
+        t.park
+    FROM v_player_debut_team AS pdt
+    INNER JOIN teams AS t
+        ON pdt.debut_year = t.yearid
+       AND pdt.debut_teamid = t.teamid
+),
+player_morpho_region AS (
+    SELECT
+        m.playerid,
+        m.height,
+        m.weight,
+        COALESCE(pr.region, 'Unknown') AS region
+    FROM player_debut_park AS pdp
+    INNER JOIN v_player_morpho AS m
+        ON pdp.playerid = m.playerid
+    LEFT JOIN v_park_region AS pr
+        ON pdp.park = pr.parkname
+        OR pdp.park = pr.parkalias
+    WHERE m.height IS NOT NULL
+      AND m.weight IS NOT NULL
+)
+SELECT
+    region,
+    ROUND(AVG(weight), 2) AS avg_weight,
+    ROUND(AVG(height), 2) AS avg_height
+FROM player_morpho_region
+GROUP BY region
+ORDER BY region;
+
+-- Same result as advanced Q4.8: debut physiques vary modestly
+-- by park region. Players debuting in Western, Southern, and
+-- International parks tend to be slightly taller and heavier,
+-- while Northeast and Midwest debut profiles are somewhat
+-- smaller on average.
+
+
+-- ----------------------------------------
+-- End of Optimised Analytical Queries Code
+-- ----------------------------------------

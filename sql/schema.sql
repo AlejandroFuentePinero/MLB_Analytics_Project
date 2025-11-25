@@ -325,3 +325,8 @@ CREATE TABLE teamsfranchises (
     active      TEXT,              -- 'Y', 'N', 'NA'
     naassoc     TEXT               -- historical association (e.g. 'NA', 'PNA', 'BNA'), nullable
 );
+
+
+-- ------------------
+-- End of SCHEMA Code
+-- ------------------

@@ -1,81 +1,86 @@
 # MLB Analytics Project — Lahman Database (1871–2024)
 
-This project explores long-term patterns in MLB player development, careers, salaries, talent pipelines, and postseason performance using the Lahman Baseball Database (1871–2024).  
-It is designed as a **portfolio-ready SQL analytics project**, showcasing advanced SQL skills, modular analysis design, and optional Python-based EDA.
+This project explores long-term patterns in MLB player development, salaries, careers, and physical characteristics using the Lahman Baseball Database (1871–2024).  
+It demonstrates relational modelling, analytical views, window functions, multi-step CTE pipelines, and Python-based EDA.
 
 ---
 
-## 1. Overview
+# 1. Overview
 
-Using the Lahman Database (1871–2024), this project investigates four major themes:
+The project investigates four major analytical themes:
 
-- **Talent Pipelines** — Which colleges produce MLB players and how these patterns vary across decades.
-- **Team Salary & Payroll Dynamics** — How payroll evolves, which teams spend the most, and how spending relates to postseason outcomes.
-- **Career Trajectories** — Debut age, retirement age, career longevity, and player loyalty to their first team.
-- **Player Physical & Comparative Profiles** — How height, weight, and handedness vary across eras, teams, positions, and leagues.
+- Talent Pipelines — Which colleges produce MLB players, and how this has changed over time and geography.  
+- Team Salary & Payroll Dynamics — How payroll evolves, which teams invest most heavily, and how spending relates to postseason performance.  
+- Career Trajectories — Debut age, retirement age, career longevity, and the degree of team loyalty.  
+- Player Physical & Comparative Profiles — How height, weight, and handedness vary across eras, positions, leagues, and regions.
 
-Advanced analysis includes Hall of Fame comparisons, multi-era splits, ballpark-factor effects, and multi-step SQL models using chained CTEs and window functions.
+Advanced components include Hall of Fame comparisons, debut-to-final-team mapping, salary inequality metrics, era splits, and geography-linked physical analyses.
 
 ---
 
-## 2. Data Source
+# 2. Data Source
 
-- **Dataset:** Lahman Baseball Database  
-- **Version:** 2024 release (1871–2024)  
-- **Website:** https://sabr.org/lahman-database/  
-- **Repository Data Layout:**
-  - `data/core/` — Core Lahman CSV tables used in the project  
-  - `data/extra/` — Additional CSV tables not used in this project  
-  - `readme2024u.txt` — Official dataset documentation  
+Dataset: Lahman Baseball Database  
+Version: 2024 release (1871–2024)  
+Website: https://sabr.org/lahman-database/
 
-### PostgreSQL Setup
+Repository data layout:
 
-The project uses **manually created tables**, defined in `schema.sql`.  
-You **must run schema.sql before importing any CSV files**.
+- data/core/ — Core Lahman CSV tables used in this project  
+- data/extra/ — Supplementary tables (not used) 
+- data/output/ - SQL outputs used for visualisation in the notebook. 
+- readme2024u.txt — Official data documentation  
 
-Analytical views may optionally reside in a separate schema:
+PostgreSQL setup:  
+Tables are created manually using sql/schema.sql.  
+Run this before loading data:
 
-```sql
+```
+\i sql/schema.sql;
+```
+
+Analytical views may be stored in an optional schema:
+
+```
 CREATE SCHEMA IF NOT EXISTS mlb_analytics;
 ```
 
-Raw tables remain in `public`.
-
 ---
 
-## 3. Repository Structure
+# 3. Repository Structure
 
 ```
 MLB_Analytics_Project/
 │
 ├── data/
-│   ├── core/                    # Core Lahman CSV tables
-│   ├── extra/                   # Extra Lahman tables (not used)
-│   └── readme2024u.txt          # Official dataset README
+│   ├── core/                    # Core CSV tables
+│   ├── extra/                   # Unused additional tables
+│   ├── output/                  # SQL output tables
+│   └── readme2024u.txt          # Official documentation
 │
 ├── sql/
-│   ├── schema.sql               # CREATES all 10 base Lahman tables
-│   ├── views.sql                # Analytical views (joins, summaries)
-│   ├── analysis_queries.sql     # Core business questions
-│   ├── advanced_queries.sql     # Extended portfolio queries
-│   └── optimised_queries.sql    # Performance-tuned versions
-│
-├── notebooks/
-│   └── exploration.ipynb        # Optional Python EDA notebook
+│   ├── schema.sql               # Table creation
+│   ├── views.sql                # Analytical views
+│   ├── analysis_queries.sql     # Core business queries
+│   ├── advanced_queries.sql     # Extended analysis
+│   └── optimised_queries.sql    # View-based refined versions
 │
 ├── docs/
-│   ├── project_overview.md      # Narrative overview
-│   ├── business_questions.md    # Full question list (core + advanced)
-│   └── schema_design.md         # Documentation of all tables + schema
+│   ├── project_overview.md      
+│   ├── business_questions.md    
+│   └── schema_design.md         
+│
+├── notebooks/
+│   └── mlb_visual_analysis.ipynb # EDA notebook
 │
 └── README.md                    # This file
 ```
 
 ---
 
-## 4. Business Questions
+# 4. Business Questions
 
-The full list of questions is documented in:
+All questions analysed are documented in:
 
 ```
 docs/business_questions.md
@@ -83,85 +88,54 @@ docs/business_questions.md
 
 Topics include:
 
+- College-to-MLB pipelines  
 - Debut & retirement age distributions  
 - Career length modelling  
-- College-to-MLB talent pipelines  
-- Team salary trends & payroll evolution  
-- Postseason success vs payroll  
-- Hall-of-Fame vs non-HOF career differences  
-- Height, weight, handedness trends  
-- Team-level physical and handedness profiles  
+- Salary trends & payroll inequality  
+- Postseason success vs financial investment  
+- Hall of Fame vs non-HOF comparisons  
+- Physical traits across eras, leagues, and positions  
+- Ballpark geography and debut profiles  
 
-Questions are labeled:
+Questions follow the convention:
 
-- **(C)** — Core question  
-- **(advanced query)** — Extended portfolio analysis  
+- (C) — Core question  
+- (advance query) — Extended portfolio analysis  
 
 ---
 
-## 5. How to Run the Project
+# 5. How to Run the Project
 
-### A. Create All Tables in PostgreSQL
+### A. Create All Tables
 
-First, create an empty PostgreSQL database (e.g., `lahman_2024` or `mlb_project`).
+Build an empty PostgreSQL database, then:
 
-Then run:
-
-```sql
+```
 \i sql/schema.sql;
 ```
 
-This will create the following tables:
+### B. Import CSV Data
 
-- appearances  
-- collegeplaying  
-- halloffame  
-- parks  
-- people  
-- pitching  
-- salaries  
-- schools  
-- seriespost  
-- teams  
-- teamsfranchises  
+Load each CSV in data/core/ into its corresponding table.  
+Ensure header rows and delimiter settings are correct.
 
-### B. Import CSV Data into These Tables
+### C. Create Analytical Views
 
-After the tables exist:
-
-1. Open pgAdmin / DBeaver / Azure Data Studio.
-2. Import each CSV from `data/core/` into its corresponding table.
-3. Ensure import settings align with the schema (e.g., header = true).
-
-This step loads the actual data into the tables created by `schema.sql`.
-
-### C. Create Analytical Views (Optional)
-
-After loading all data, run:
-
-```sql
+```
 \i sql/views.sql;
 ```
 
-This will create reusable analytical views under the optional schema:
+This generates reusable analytical views.
 
-```sql
-CREATE SCHEMA IF NOT EXISTS mlb_analytics;
-```
+### D. Run Queries
 
-### D. Run Analytical Queries
+Execute:
 
-Use the SQL files in:
+- sql/analysis_queries.sql
+- sql/advanced_queries.sql
+- sql/optimised_queries.sql
 
-```
-sql/analysis_queries.sql
-sql/advanced_queries.sql
-sql/optimised_queries.sql
-```
-
-These can be executed in pgAdmin, DBeaver, Azure Data Studio, or psql.
-
-### E. Optional Python EDA
+### E. Python EDA
 
 Open:
 
@@ -169,55 +143,102 @@ Open:
 notebooks/exploration.ipynb
 ```
 
-Includes:
-
-- SQL → pandas integration  
-- Visualisation of long-term trends  
-- Exploratory deep-dives  
+Includes pandas–SQL integration and long-term visualisations.
 
 ---
 
-## 6. Tools & Techniques Demonstrated
+# 6. Tools & Techniques Demonstrated
 
-- Relational modelling  
-- Manual schema creation (`schema.sql`)  
-- Window functions (RANK, LAG/LEAD, percentiles, rolling stats)  
+- Manual relational schema creation  
+- Analytical view design  
+- Window functions (RANK, PERCENTILE, LAG/LEAD)  
 - Multi-step CTE pipelines  
-- Schema and analytical view design  
-- Linking multi-table baseball records  
-- Advanced SQL tuning (EXPLAIN/ANALYZE)  
-- SQL + Python EDA workflow  
+- Joining multi-table baseball records  
+- SQL performance tuning  
+- SQL + Python EDA workflows  
 
 ---
 
-## 7. Key Findings  
-(*To be completed after analysis*)  
+# 7. Integrated Project Summary & Key Findings
 
-Expected insights include:
-
-- How college talent pipelines shift across time  
-- Payroll inequality and long-term spending trends  
-- Career length variation among positions  
-- Hall-of-Fame vs non-HOF performance  
-- Height and weight evolution across MLB history  
-- Ballpark effects on performance and player profiles  
-- Team-level athletic and handedness compositions  
+This project builds a multi-layered, data-driven narrative of MLB’s evolution, spanning origins, economics, career outcomes, and physical traits. Although split into four sections, the analysis forms a continuous story about talent, opportunity, and athletic change.
 
 ---
 
-## 8. Purpose
+## Part I — Schools and MLB Talent Pipelines
 
-This repository serves both as:
+Part I examines where MLB players come from and how the collegiate pipeline has changed across time.
 
-1. A **portfolio-grade SQL project** demonstrating professional relational modelling, table creation, data loading, analytical view design, and advanced querying.  
-2. A **deep exploration of MLB history**, covering salaries, careers, talent pipelines, physical traits, and postseason dynamics.
-
-The layered design (schema → data import → analytic views → queries → EDA) reflects real-world analytics workflows.
+### Key Findings
+- Around 28 percent of MLB players have a documented college affiliation, spread across 1,100+ schools, indicating a large and decentralised talent system.  
+- School representation increases sharply after 1950, driven by the growth of collegiate baseball and improved scouting.  
+- Geographic patterns shift: early talent comes primarily from the Northeast and Midwest, while modern pipelines favour the South and West.  
+- Schools with established baseball programs tend to produce more players and longer MLB careers.
 
 ---
 
-## 9. License / Attribution
+## Part II — Salary, Payroll Evolution, and Competitive Dynamics
+
+Part II examines the financial landscape players enter as professionals.
+
+### Key Findings
+- The salary dataset (1985–2016) captures the modern era of escalating team budgets.  
+- The New York Yankees maintain a historic lead in cumulative payroll spending.  
+- Other high-spending teams (Red Sox, Dodgers, Mets) invest heavily but do not match the Yankees' multi-decade consistency.  
+- The median payroll is roughly two-thirds of the top-tier payrolls, indicating structural financial inequality.  
+- Postseason success is closely associated with higher payrolls.
+
+---
+
+## Part III — Career Trajectories, Longevity, and Team Loyalty
+
+Part III explores what happens after players reach MLB.
+
+### Key Findings
+- MLB careers are typically short, with only a minority sustaining decade-long tenures.  
+- Hall of Fame players debut younger, play longer, and accumulate more games than non-inductees.  
+- Team mobility is common; relatively few players spend their entire career with one franchise.  
+- Historically stable franchises anchor many long-tenured players.
+
+---
+
+## Part IV — Player Comparison and Physical Profiles
+
+Part IV focuses on athletic traits and debut context.
+
+### Key Findings
+- Height and weight data are over 90 percent complete.  
+- Average debut height has risen from about 5 ft 8 in to more than 6 ft 1 in, with weight increases even larger.  
+- Pitchers debut slightly taller and heavier than non-pitchers.  
+- AL and NL players show nearly identical physical profiles in each era.  
+- Geographic patterns show players debuting in western or international parks tend to be slightly larger on average.
+
+---
+
+# Integrated Narrative
+
+Across all sections, a coherent picture emerges:
+
+1. The MLB talent pipeline has broadened geographically and institutionally.  
+2. Team financial capacity strongly shapes opportunity and competitive landscapes.  
+3. Career outcomes depend on early debut age, longevity, mobility, and organisational context.  
+4. Physical traits have evolved alongside strategic, developmental, and economic changes.
+
+Together, these insights provide a comprehensive view of MLB’s evolution, from origins to opportunity, from financial investment to career trajectory, and from physical development to long-term outcomes.
+
+---
+
+# 8. Purpose
+
+This repository serves as both:
+
+1. A portfolio-grade SQL project demonstrating professional relational modelling, advanced query design, analytical view architecture, and performance optimisation.  
+2. A substantive exploration of MLB history, spanning salaries, careers, development systems, physical traits, and postseason dynamics.
+
+---
+
+# 9. License / Attribution
 
 The Lahman Baseball Database is distributed under the  
-**Creative Commons Attribution–ShareAlike 3.0 Unported License**.  
-Details: https://creativecommons.org/licenses/by-sa/3.0/
+Creative Commons Attribution–ShareAlike 3.0 Unported License:  
+https://creativecommons.org/licenses/by-sa/3.0/

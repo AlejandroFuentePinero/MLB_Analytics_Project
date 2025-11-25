@@ -384,3 +384,195 @@ WHERE career_length >= 10
   AND debut_team = final_team;
 
 -- Answer: 422 players played 10+ years and finished on the same team they debuted with.
+
+-- -----------------------------------------------
+-- Part IV — Player Comparison & Physical Profiles
+-- -----------------------------------------------
+
+-- Q4.1 (C)
+-- Data Completeness
+-- How complete are height, weight, and handedness (bats) data across the MLB player population?
+
+SELECT
+    ROUND((COUNT(weight)::numeric / COUNT(*)) * 100, 1) AS weight_completeness_pct,
+    ROUND((COUNT(height)::numeric / COUNT(*)) * 100, 1) AS height_completeness_pct,
+    ROUND((COUNT(bats)::numeric   / COUNT(*)) * 100, 1) AS handedness_completeness_pct
+FROM people;
+
+-- Answer: Height and weight fields are ~90% complete; handedness slightly lower (~88%),
+-- providing sufficient coverage for physical-profile comparisons in later questions.
+
+
+-- Q4.2 (C)
+-- Shared Birthdays
+-- Which players share the same birthday, and which birthday is most common?
+
+WITH bday AS (
+    SELECT
+        playerid,
+        MAKE_DATE(birthyear, birthmonth, birthday) AS birth_date
+    FROM people
+    WHERE birthyear IS NOT NULL
+      AND birthmonth IS NOT NULL
+      AND birthday IS NOT NULL
+)
+
+-- 1) All unique pairs of players who share the same birthday
+SELECT
+    b1.playerid AS player1,
+    b1.birth_date AS birth_date,
+    b2.playerid AS player2
+FROM bday AS b1
+INNER JOIN bday AS b2
+    ON b1.birth_date = b2.birth_date
+   AND b1.playerid  < b2.playerid;
+
+-- Answer: There are 5,271 unique unordered pairs of players who share the same birthday.
+
+
+-- 2) Birthday(s) shared by the most players
+WITH bday AS (
+    SELECT
+        playerid,
+        MAKE_DATE(birthyear, birthmonth, birthday) AS birth_date
+    FROM people
+    WHERE birthyear IS NOT NULL
+      AND birthmonth IS NOT NULL
+      AND birthday IS NOT NULL
+),
+bday_counts AS (
+    SELECT
+        birth_date,
+        COUNT(*) AS bday_count
+    FROM bday
+    GROUP BY birth_date
+)
+
+SELECT
+    birth_date,
+    bday_count
+FROM bday_counts
+WHERE bday_count = (
+    SELECT MAX(bday_count) FROM bday_counts
+)
+ORDER BY birth_date;
+
+-- Answer: The most common birthdays in the dataset each have 6 players sharing the same date,
+-- with no single standout "MLB birthday"; shared birthdays are broadly dispersed.
+
+-- Q4.3 (C)
+-- Team Handedness Composition
+-- For each team, what percentage of players bat right, left, or both?
+
+WITH team_bats AS (
+    SELECT
+        a.teamid,
+        a.playerid,
+        p.bats
+    FROM appearances AS a
+    LEFT JOIN people AS p
+        ON a.playerid = p.playerid
+    WHERE p.bats IS NOT NULL
+),
+
+total_players_cte AS (
+    SELECT
+        teamid,
+        COUNT(DISTINCT playerid)::numeric AS total_players
+    FROM team_bats
+    GROUP BY teamid
+),
+
+player_bats AS (
+    SELECT
+        teamid,
+        bats,
+        COUNT(DISTINCT playerid)::numeric AS players_bats
+    FROM team_bats
+    GROUP BY teamid, bats
+),
+
+bats_pct_table AS (
+    SELECT
+        pb.teamid,
+        pb.bats,
+        pb.players_bats,
+        t.total_players,
+        ROUND((pb.players_bats / t.total_players) * 100, 2) AS bats_pct
+    FROM player_bats AS pb
+    LEFT JOIN total_players_cte AS t
+        ON pb.teamid = t.teamid
+)
+
+SELECT
+    teamid,
+    MAX(CASE WHEN bats = 'R' THEN bats_pct ELSE 0 END) AS pct_r,
+    MAX(CASE WHEN bats = 'L' THEN bats_pct ELSE 0 END) AS pct_l,
+    MAX(CASE WHEN bats = 'B' THEN bats_pct ELSE 0 END) AS pct_b
+FROM bats_pct_table
+GROUP BY teamid
+ORDER BY teamid;
+
+-- Answer: Team-level compositions show that most clubs have 60–75% right-handed hitters,
+-- 25–35% left-handed, and ~5–10% switch hitters.
+
+-- Q4.4 (C)
+-- Physical Traits at Debut
+-- How have average height and average weight at debut changed over time?
+
+SELECT
+    EXTRACT(YEAR FROM debut) AS debut_year,
+    ROUND(AVG(weight), 2) AS avg_weight,
+    ROUND(AVG(height), 2) AS avg_height
+FROM people
+WHERE debut IS NOT NULL
+GROUP BY EXTRACT(YEAR FROM debut)
+ORDER BY debut_year;
+
+-- Answer: Players debuting in the late 19th century were much smaller; heights stabilized early,
+-- but weights increased substantially from the 1970s onward.
+
+-- Q4.5 (C)
+-- Decade-over-Decade Change
+-- For each debut decade, what is the change in average height and weight
+-- relative to the previous decade?
+
+WITH decade_average AS (
+    SELECT
+        FLOOR(EXTRACT(YEAR FROM debut) / 10) * 10 AS debut_decade,
+        ROUND(AVG(weight), 2) AS avg_weight,
+        ROUND(AVG(height), 2) AS avg_height
+    FROM people
+    WHERE debut IS NOT NULL
+    GROUP BY FLOOR(EXTRACT(YEAR FROM debut) / 10) * 10
+),
+with_lag AS (
+    SELECT
+        debut_decade,
+        avg_weight,
+        LAG(avg_weight) OVER (ORDER BY debut_decade) AS lagged_weight,
+        avg_height,
+        LAG(avg_height) OVER (ORDER BY debut_decade) AS lagged_height
+    FROM decade_average
+)
+
+SELECT
+    debut_decade,
+    avg_weight,
+    lagged_weight,
+    ROUND(avg_weight - lagged_weight, 2) AS weight_change,
+    avg_height,
+    lagged_height,
+    ROUND(avg_height - lagged_height, 2) AS height_change
+FROM with_lag
+ORDER BY debut_decade;
+
+-- Answer: Weight shows large positive jumps in the 1930s and especially 1990s–2000s,
+-- while height changes are modest and plateau by the mid-20th century.
+
+
+-- ------------------------------------
+-- End of Basic Analytical Queries Code
+-- ------------------------------------
+-- See advanced_queries.sql for extended analyses
+-- and optimised_queries.sql for refactored query versions.

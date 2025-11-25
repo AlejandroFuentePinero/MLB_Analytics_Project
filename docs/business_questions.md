@@ -3,7 +3,7 @@
 This document defines the analytical questions addressed in the MLB Analytics Project.  
 
 - Questions marked **(C)** come directly from the Udemy course project.  
-- Questions marked **(advance query)** are additional portfolio-focused questions intended primarily for `advanced_queries.sql`.
+- Questions marked **(advance query)** are additional portfolio-focused questions intended to expand on more advanced query techniques.
 
 ---
 
@@ -152,27 +152,45 @@ To identify the primary franchise of each Hall of Famer, I summed every type of 
 **Q4.1 (C)** — Data Completeness  
 How complete are height, weight, and handedness (`bats`) data across the player population?
 
+The physical-profile fields in the Lahman database are highly complete. Height data is recorded for roughly **92%** of players, weight for **91%**, and batting handedness for **about 88%**. This strong level of coverage provides confidence in the analyses that follow, especially comparisons across positions, leagues, and eras. Because missing values are limited and broadly distributed across MLB history, the dataset offers a reliable foundation for understanding player body characteristics and batted-hand tendencies without major bias introduced by data gaps.
+
 **Q4.2 (C)** — Shared Birthdays  
 Which players share the same birthday, and which birthday is most common?
+
+Many MLB players share birthdays with at least one other player. Using all players with complete birth dates, there are **5,271 unique unordered pairs** of players who were born on the same calendar day. When summarising birthdays by date, the most common birthdays are each shared by **six players**, with several different dates tied at this level rather than a single dominant “MLB birthday.” Overall, shared birthdays are fairly evenly dispersed across the calendar, suggesting no meaningful clustering in player birth dates beyond what we would expect by chance.
 
 **Q4.3 (C)** — Team Handedness Composition  
 For each team, what percentage of players bat **right**, **left**, or **both**?
 
+Across MLB teams, right-handed hitters clearly dominate roster construction. Averaging across all franchises, roughly **68%** of players bat right-handed, around **26%** bat left-handed, and only **6%** are switch hitters. At the team level, most clubs fall within this same range, typically featuring **60–75% right-handed hitters**, **25–35% left-handers**, and **5–10% switch hitters**. These patterns reflect the long-standing tendency for MLB lineups to be right-heavy, with left-handed and switch hitters forming a consistent but much smaller portion of the talent pool.
+
 **Q4.4 (C)** — Physical Traits at Debut  
 How have **average height** and **average weight at debut** changed over time?
+
+Average debut height and weight have both increased across MLB history, but at different rates. Players in the 1870s–early 1900s debuted at roughly **5'8"–5'10"** and **155–175 lbs**, reflecting the smaller physical profiles of early professional baseball. Heights rose steadily into the early 20th century and stabilised around **6'0"–6'1"** by the 1930s, remaining remarkably consistent thereafter. Weight, however, continued rising: from **~180 lbs** in the 1940s to **190–200 lbs** in the 1970s, and exceeding **200 lbs** from the 1990s onward. Modern debuting players average around **73.5 inches (6'1")** and **205–212 lbs**, making them significantly heavier—but not much taller—than players from earlier eras. These patterns indicate that MLB’s physical evolution has been driven far more by increases in strength and mass than by changes in height.
 
 **Q4.5 (C)** — Decade-over-Decade Change  
 For each debut decade, what is the Δ (change) in average height and weight relative to the previous decade?
 
+Looking at debut physical traits by decade confirms that MLB players have grown heavier much more than they have grown taller. From the 1870s to the early 1900s, average debut weight typically increases by **1–6 lbs per decade**, with occasional flat or slightly negative decades such as the 1910s. A clear step change occurs in the 1930s, followed by another strong jump between the 1980s and 1990s, and an especially large increase from the 1990s to the 2000s (over **+10 lbs** in one decade). In contrast, average debut height changes only by **0.1–0.7 inches** per decade, with the largest gains early in the 20th century and very small changes after the 1950s as heights stabilise around **6'1"–6'2"**. Overall, the decade-over-decade pattern shows that the modern MLB player has become progressively heavier across eras, while height has largely plateaued since the mid-20th century.
+
 **Q4.6 (advance query)** — Pitchers vs Non-Pitchers  
 How do debut physical profiles (height and weight) compare between pitchers and non-pitchers?
 
+Comparing debut physiques between pitchers and non-pitchers shows a clear physical specialization for the pitching role. Players who ever appear as pitchers debut at an average of roughly **73.1 inches (6'1")** and **192 lbs**, while non-pitchers average about **71.4 inches (just under 5'11½")** and **183 lbs**. In other words, pitchers are around **1.5–2 inches taller** and almost **10 lbs heavier** at debut than position players. This gap suggests that MLB teams consistently favour larger, more physically imposing bodies on the mound, even before any major-league performance data are available.
+
 **Q4.7 (advance query)** — Debut Profiles by Era and League  
 Compare average debut height and weight between leagues (AL vs NL) across eras (e.g. pre-1960, 1960–1989, 1990–present).
+ 
+To compare how player physiques differed between the American League (AL) and National League (NL), we matched each player to the team and league they debuted with and grouped their debut height and weight into three broad eras (pre-1960, 1960–1989, 1990–present). The results show that AL and NL players are physically almost indistinguishable in every era. Both leagues experience the same long-term trend: modest increases in height and substantial increases in weight across the century. The modern era (1990–present) shows the largest jump, with debuting players averaging over **205 lbs** and **73.6 inches**, much larger than their pre-1960 counterparts.
 
-**Q4.8 (advance query)** — Home Ballpark & Player Profile  
-Using home ballpark information, classify parks into simple categories (e.g. high-altitude vs sea-level or by park characteristic).  
-Do players debuting for teams in certain park categories differ systematically in average height or weight?
+**Q4.8 (Advanced) — Home Ballpark & Player Profile**  
+Do debut physical profiles vary depending on the geographic region of a player’s first MLB home ballpark?
+Compare average debut height and weight for players whose first team belongs to each region to see if any systematic differences emerge.
+
+To evaluate whether debut player physiques vary with the geographic region of a team’s home ballpark, each park was assigned to a broad region (Northeast, Midwest, South, West, or International) based on its city and state. We then matched players to the park used by their debut team in their debut season and compared average debut height and weight across these regions.
+
+The results show modest but consistent regional differences. Players debuting in the **West** and in **International** parks (e.g., Toronto, Montreal) are the largest on average, typically around **73.2–73.3 inches** and **197+ lbs**. The **South** also produces relatively large debuting players (≈72.9 inches, 194.5 lbs). In contrast, debut players in the **Northeast** and **Midwest** tend to be smaller, averaging **71.6–72.2 inches** and **≈181–186 lbs**. These differences are not dramatic, but they suggest that regional scouting and developmental pipelines may shape slight variations in the physical profiles of players entering MLB.
 
 ---
 

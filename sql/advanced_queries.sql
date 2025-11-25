@@ -682,3 +682,195 @@ ORDER BY hof_count DESC;
 -- Answer: YANKEES (NYA) have the most HOF players primarily associated
 -- with their franchise, followed by the Cardinals (SLN), White Sox (CHA),
 -- and Cubs (CHN).
+
+-- -----------------------------------------------
+-- Part IV — Player Comparison & Physical Profiles
+-- -----------------------------------------------
+
+-- Q4.6 (Advanced)
+-- Pitchers vs Non-Pitchers
+-- How do debut physical profiles (height and weight) compare between pitchers and non-pitchers?
+
+WITH player_pitching_role AS (
+    SELECT
+        playerid,
+        CASE WHEN SUM(g_p) > 0 THEN 1 ELSE 0 END AS pitching_flag
+    FROM appearances
+    GROUP BY playerid
+),
+pitching_morpho AS (
+    SELECT
+        p.playerid,
+        p.height,
+        p.weight,
+        pr.pitching_flag
+    FROM people AS p
+    INNER JOIN player_pitching_role AS pr
+        ON p.playerid = pr.playerid
+    WHERE p.height IS NOT NULL
+      AND p.weight IS NOT NULL
+)
+
+SELECT
+    CASE WHEN pitching_flag = 1 THEN 'Pitcher' ELSE 'Non-pitcher' END AS role,
+    ROUND(AVG(height), 2) AS avg_height,
+    ROUND(AVG(weight), 2) AS avg_weight
+FROM pitching_morpho
+GROUP BY pitching_flag
+ORDER BY pitching_flag;
+
+-- Answer: Pitchers debut on average ~1.7 inches taller and ~9.5 pounds heavier than non-pitchers,
+-- indicating a clear physical specialization for the pitching role.
+
+-- Q4.7 (Advanced)
+-- Debut Profiles by Era and League
+-- Compare average debut height and weight between leagues (AL vs NL)
+-- across eras (pre-1960, 1960–1989, 1990–present).
+
+WITH player_debut AS (
+    SELECT
+        playerid,
+        MIN(yearid) AS debut_year
+    FROM appearances
+    GROUP BY playerid
+),
+
+player_debut_team AS (
+    SELECT DISTINCT
+        pd.playerid,
+        pd.debut_year,
+        a.teamid
+    FROM player_debut AS pd
+    INNER JOIN appearances AS a
+        ON pd.playerid = a.playerid
+       AND pd.debut_year = a.yearid
+),
+
+player_debut_league AS (
+    SELECT
+        pdt.playerid,
+        pdt.debut_year,
+        t.lgid AS league
+    FROM player_debut_team AS pdt
+    INNER JOIN teams AS t
+        ON pdt.debut_year = t.yearid
+       AND pdt.teamid     = t.teamid
+    WHERE t.lgid IN ('AL', 'NL')
+),
+
+morpho_by_era AS (
+    SELECT
+        pdl.playerid,
+        pdl.league,
+        CASE
+            WHEN pdl.debut_year < 1960 THEN 'a_pre-1960'
+            WHEN pdl.debut_year < 1990 THEN 'b_1960-1989'
+            ELSE 'c_1990-present'
+        END AS era,
+        ppl.height,
+        ppl.weight
+    FROM player_debut_league AS pdl
+    INNER JOIN people AS ppl
+        ON pdl.playerid = ppl.playerid
+    WHERE ppl.height IS NOT NULL
+      AND ppl.weight IS NOT NULL
+)
+
+SELECT
+    era,
+    league,
+    ROUND(AVG(weight), 2) AS avg_weight,
+    ROUND(AVG(height), 2) AS avg_height
+FROM morpho_by_era
+GROUP BY era, league
+ORDER BY era, league;
+
+-- Answer: AL and NL debut physiques are nearly identical in every era.
+-- Both leagues show large increases in weight (and modest height rises)
+-- from pre-1960 → 1960–1989 → 1990–present.
+
+-- Q4.8 (Advanced)
+-- Home Ballpark & Player Profile
+-- Do debut physical profiles vary depending on the geographic region
+-- of a player's first MLB home ballpark?
+
+WITH park_region AS (
+    SELECT
+        parkname,
+        parkalias,
+        CASE 
+            WHEN state IN ('MA','NY','PA','NJ','CT','RI','VT','NH','ME') THEN 'Northeast'
+            WHEN state IN ('IL','OH','MI','WI','IN','MN','IA','MO','KS','NE','SD','ND') THEN 'Midwest'
+            WHEN state IN ('TX','FL','GA','AL','MS','LA','SC','NC','VA','WV','KY','TN','OK','AR','MD','DC') THEN 'South'
+            WHEN state IN ('CA','WA','OR','CO','AZ','NV','NM','UT','ID','MT','WY') THEN 'West'
+            ELSE 'International'
+        END AS region
+    FROM parks
+),
+
+player_debut AS (
+    SELECT
+        playerid,
+        EXTRACT(YEAR FROM debut)::INT AS debut_year,
+        height,
+        weight
+    FROM people
+    WHERE debut IS NOT NULL
+      AND height IS NOT NULL
+      AND weight IS NOT NULL
+),
+
+player_debut_team AS (
+    SELECT DISTINCT
+        pd.playerid,
+        pd.debut_year,
+        a.teamid,
+        pd.height,
+        pd.weight
+    FROM player_debut AS pd
+    INNER JOIN appearances AS a
+        ON pd.playerid = a.playerid
+       AND pd.debut_year = a.yearid
+),
+
+team_parks AS (
+    SELECT
+        pdt.playerid,
+        pdt.height,
+        pdt.weight,
+        t.park
+    FROM player_debut_team AS pdt
+    INNER JOIN teams AS t
+        ON pdt.debut_year = t.yearid
+       AND pdt.teamid     = t.teamid
+),
+
+people_park_region AS (
+    SELECT
+        tp.playerid,
+        tp.height,
+        tp.weight,
+        COALESCE(pr.region, 'Unknown') AS region
+    FROM team_parks AS tp
+    LEFT JOIN park_region AS pr
+        ON tp.park = pr.parkname
+        OR tp.park = pr.parkalias
+)
+
+SELECT
+    region,
+    ROUND(AVG(weight), 2) AS avg_weight,
+    ROUND(AVG(height), 2) AS avg_height
+FROM people_park_region
+GROUP BY region
+ORDER BY region;
+
+-- Answer: Debut physiques vary modestly by region: players debuting in Western, Southern,
+-- and International parks tend to be taller/heavier, while Northeast/Midwest regions
+-- show slightly smaller debut profiles.
+
+-- ---------------------------------------
+-- End of Advanced Analytical Queries Code
+-- ---------------------------------------
+-- See analysis_queries.sql for initial analyses
+-- and optimised_queries.sql for refactored query versions.
