@@ -18,7 +18,7 @@ The project demonstrates:
 - Clear separation of core vs extended business questions  
 - Optional Python visualisation for narrative clarity  
 
-The project is not just a collection of queries; it is a **guided analytics system** designed to model real database workflows.
+The project is a **guided analytics system** designed to model real database workflows.
 
 ---
 
@@ -81,8 +81,7 @@ All optimised queries rely on these views.
 ## analysis_queries.sql  
 Contains **core business questions**.  
 Each query is self-contained and written from first principles  
-(no reliance on analytical views).  
-Designed for clarity and pedagogy.
+(no reliance on analytical views).
 
 ## advanced_queries.sql  
 Builds on the core analysis:  
