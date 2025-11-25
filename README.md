@@ -175,6 +175,10 @@ Part I examines where MLB players come from and how the collegiate pipeline has 
 - Geographic patterns shift: early talent comes primarily from the Northeast and Midwest, while modern pipelines favour the South and West.  
 - Schools with established baseball programs tend to produce more players and longer MLB careers.
 
+<p align="center">
+  <img src="images/q1_7.png" width="600">
+</p>
+
 ---
 
 ## Part II — Salary, Payroll Evolution, and Competitive Dynamics
@@ -188,6 +192,11 @@ Part II examines the financial landscape players enter as professionals.
 - The median payroll is roughly two-thirds of the top-tier payrolls, indicating structural financial inequality.  
 - Postseason success is closely associated with higher payrolls.
 
+<p align="center">
+  <img src="images/q2_6.png" width="600">
+</p>
+
+
 ---
 
 ## Part III — Career Trajectories, Longevity, and Team Loyalty
@@ -199,6 +208,10 @@ Part III explores what happens after players reach MLB.
 - Hall of Fame players debut younger, play longer, and accumulate more games than non-inductees.  
 - Team mobility is common; relatively few players spend their entire career with one franchise.  
 - Historically stable franchises anchor many long-tenured players.
+
+<p align="center">
+  <img src="images/q3_2.png" width="600">
+</p>
 
 ---
 
@@ -212,6 +225,11 @@ Part IV focuses on athletic traits and debut context.
 - Pitchers debut slightly taller and heavier than non-pitchers.  
 - AL and NL players show nearly identical physical profiles in each era.  
 - Geographic patterns show players debuting in western or international parks tend to be slightly larger on average.
+
+<p align="center">
+  <img src="images/q4_4.png" width="600">
+</p>
+
 
 ---
 
