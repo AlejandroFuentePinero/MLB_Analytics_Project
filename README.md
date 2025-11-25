@@ -140,7 +140,7 @@ Execute:
 Open:
 
 ```
-notebooks/exploration.ipynb
+notebooks/mlb_visual_analysis.ipynb
 ```
 
 Includes pandas–SQL integration and long-term visualisations.
