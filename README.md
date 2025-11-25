@@ -36,7 +36,7 @@ Tables are created manually using sql/schema.sql.
 Run this before loading data:
 
 ```
-\i sql/schema.sql;
+sql/schema.sql;
 ```
 
 Analytical views may be stored in an optional schema:
@@ -111,7 +111,7 @@ Questions follow the convention:
 Build an empty PostgreSQL database, then:
 
 ```
-\i sql/schema.sql;
+sql/schema.sql;
 ```
 
 ### B. Import CSV Data
@@ -122,7 +122,7 @@ Ensure header rows and delimiter settings are correct.
 ### C. Create Analytical Views
 
 ```
-\i sql/views.sql;
+sql/views.sql;
 ```
 
 This generates reusable analytical views.
